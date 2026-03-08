@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3 class="mb-4">Панель керування</h3>
+
+<div class="row">
+
+{% if role in ['admin','warehouse'] %}
+
+<div class="col-md-4 mb-3">
+    <a href="/warehouse" class="btn btn-primary w-100 p-3 shadow">
+        📦 Склад
+    </a>
+</div>
+
+<div class="col-md-4 mb-3">
+    <a href="/reservations" class="btn btn-warning w-100 p-3 shadow">
+        📝 Резерви
+    </a>
+</div>
+
+{% endif %}
+
+{% if role == 'department' %}
+
+<div class="col-md-4 mb-3">
+    <a href="/create_reservation" class="btn btn-success w-100 p-3 shadow">
+        ➕ Створити резерв
+    </a>
+</div>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>⚠ Препарати з мінімальним залишком</h3>
+
+<table class="table table-bordered table-danger">
+<tr>
+<th>Назва</th>
+<th>Серія</th>
+<th>Залишок</th>
+<th>Мінімум</th>
+</tr>
+
+{% for m in medicines %}
+<tr>
+<td>{{ m.name }}</td>
+<td>{{ m.series }}</td>
+<td>{{ m.quantity }}</td>
+<td>{{ m.min_quantity }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+{% endblock %}

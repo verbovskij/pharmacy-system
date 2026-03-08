@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Накладні</h2>
+
+<table class="table table-bordered">
+    <thead style="background:#1f2933;color:white;">
+        <tr>
+            <th>ID</th>
+            <th>Відділення</th>
+            <th>Статус</th>
+            <th>Дата</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in reservations %}
+        <tr {% if r.status == 'pending' %}style="background:#fff3cd;"
+            {% elif r.status == 'confirmed' %}style="background:#d4edda;"
+            {% endif %}>
+            <td>{{ r.id }}</td>
+            <td>{{ r.department }}</td>
+            <td>{{ r.status }}</td>
+            <td>{{ r.created }}</td>
+            <td>
+                <a href="/reservation/{{ r.id }}" class="btn btn-primary btn-sm">
+                    Відкрити
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="/warehouse" class="btn btn-secondary">Назад на склад</a>
+
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Редагування</h3>
+<form method="POST">
+<input class="form-control mb-2" name="name" value="{{ med.name }}">
+<input class="form-control mb-2" name="series" value="{{ med.series }}">
+<input type="date" class="form-control mb-2" name="expiry" value="{{ med.expiry_date }}">
+<input class="form-control mb-2" name="location" value="{{ med.location }}">
+<input class="form-control mb-2" name="quantity" value="{{ med.quantity }}">
+<input class="form-control mb-2" name="min_quantity" value="{{ med.min_quantity }}">
+<button class="btn btn-success">Зберегти</button>
+</form>
+{% endblock %}

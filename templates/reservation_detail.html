@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Накладна №{{ reservation.id }}</h2>
+
+<p><strong>Відділення:</strong> {{ reservation.department }}</p>
+<p><strong>Статус:</strong> 
+    {% if reservation.status == 'confirmed' %}
+        <span style="color:green;">Підтверджена</span>
+    {% else %}
+        <span style="color:orange;">Очікує підтвердження</span>
+    {% endif %}
+</p>
+
+{% if reservation.status != 'confirmed' %}
+<form method="POST" action="/update_reservation/{{ reservation.id }}">
+{% endif %}
+
+<table class="table table-bordered">
+    <thead style="background:#1f2933;color:white;">
+        <tr>
+            <th>Препарат</th>
+            <th>Залишок плану</th>
+            <th>Кількість</th>
+            {% if reservation.status != 'confirmed' %}
+            <th>Редагування</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.plan }}</td>
+            <td>{{ item.quantity }}</td>
+
+            {% if reservation.status != 'confirmed' %}
+            <td>
+                <input type="number" 
+                       name="qty_{{ item.id }}" 
+                       value="{{ item.quantity }}" 
+                       min="0"
+                       class="form-control">
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if reservation.status != 'confirmed' %}
+
+<h4>Додати препарат</h4>
+
+<div style="display:flex; gap:10px;">
+    <select name="new_medicine" class="form-control">
+        <option value="">-- Вибрати --</option>
+        {% for m in medicines %}
+        <option value="{{ m.id }}">
+            {{ m.name }} (залишок: {{ m.total }})
+        </option>
+        {% endfor %}
+    </select>
+
+    <input type="number" 
+           name="new_quantity" 
+           placeholder="Кількість" 
+           class="form-control">
+</div>
+
+<br>
+
+<button type="submit" class="btn btn-warning">
+    Зберегти зміни
+</button>
+
+<a href="/confirm_reservation/{{ reservation.id }}" 
+   class="btn btn-success">
+   Підтвердити і списати
+</a>
+
+</form>
+
+{% endif %}
+
+{% if reservation.status == 'confirmed' %}
+<a href="/reservation_pdf/{{ reservation.id }}"
+   class="btn btn-danger">
+    📄 Завантажити PDF
+</a>
+{% endif %}
+
+<a href="/reservations" class="btn btn-secondary">
+    Назад
+</a>
+
+{% endblock %}

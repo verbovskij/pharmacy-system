@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Склад</h2>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+<div>
+<a href="/add_batch" class="btn btn-success me-2">➕ Додати партію</a>
+<a href="/import_excel" class="btn btn-warning me-2">📥 Імпорт Excel</a>
+<a href="/excel_template" class="btn btn-secondary me-2">
+📥 Шаблон Excel
+</a>
+<a href="/report_month" class="btn btn-success me-2">📊 Місячний звіт</a>
+<a href="/report_week" class="btn btn-info me-2">📊 Тижневий звіт</a>
+<a href="/year_plan" class="btn btn-primary">📋 Річний план відділень</a>
+</div>
+
+<div>
+
+<form method="POST" action="/create_backup" style="display:inline-block;">
+<button class="btn btn-dark">
+💾 Backup
+</button>
+</form>
+
+<button class="btn btn-danger" onclick="showClear()">
+⚠ Очистити склад
+</button>
+
+</div>
+
+</div>
+
+
+<div id="clearBlock" style="display:none; margin-bottom:15px;">
+
+<form method="POST" action="/clear_system">
+
+<input type="password"
+name="admin_password"
+placeholder="Пароль адміністратора"
+required
+class="form-control"
+style="width:250px; display:inline-block;">
+
+<button class="btn btn-danger">
+Підтвердити очищення
+</button>
+
+</form>
+
+</div>
+
+<!-- ===== NAVIGATION BUTTONS ===== -->
+<div class="mb-4">
+    <button class="btn btn-primary me-2 nav-btn active" onclick="showSection('summary')">Загальний залишок</button>
+    <button class="btn btn-success me-2 nav-btn" onclick="showSection('batches')">Партії (FEFO)</button>
+    <button class="btn btn-warning me-2 nav-btn" onclick="showSection('pending')">Непідтверджені</button>
+    <button class="btn btn-secondary me-2 nav-btn" onclick="showSection('confirmed')">Підтверджені</button>
+</div>
+
+
+<!-- ================= SUMMARY SECTION ================= -->
+
+<div id="summary-section">
+
+<h4>Загальний залишок по препаратах</h4>
+
+<div class="mb-3">
+<input type="text"
+id="summarySearch"
+class="form-control"
+placeholder="🔎 Пошук препарату..."
+onkeyup="searchSummary()">
+</div>
+
+<table id="summaryTable" class="table table-bordered table-striped">
+
+<thead class="table-dark">
+<tr>
+<th>Назва препарату</th>
+<th>Залишок</th>
+<th>Видача за 2 міс</th>
+<th>Мінімальний запас</th>
+<th>Потрібно дозамовити</th>
+</tr>
+</thead>
+
+<tbody>
+{% for m in medicines %}
+
+{% set min_stock = (m.issued_2m // 2) %}
+{% set need = min_stock - m.total %}
+
+<tr class="{% if need > 0 %}table-danger{% endif %}">
+
+<td>{{ m.name }}</td>
+
+<td>{{ m.total }}</td>
+
+<td>{{ m.issued_2m }}</td>
+
+<td>{{ min_stock }}</td>
+
+<td>
+{% if need > 0 %}
+<span class="badge bg-danger">{{ need }}</span>
+{% else %}
+0
+{% endif %}
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+
+</div>
+<!-- ================= BATCHES SECTION ================= -->
+<div id="batches-section" style="display:none;">
+
+    <h4>Партії (FEFO)</h4>
+    <div class="mb-3">
+<input type="text" id="batchSearch" class="form-control" placeholder="🔎 Пошук препарату..." onkeyup="searchBatches()">
+</div>
+
+    <table id="batchesTable" class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Назва препарату</th>
+                <th>Серія</th>
+                <th>Термін придатності</th>
+                <th>Кількість</th>
+                <th>Днів до кінця</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        {% for b in batches %}
+
+            {% if b.expiry %}
+                {% set days = (datetime.strptime(b.expiry,"%Y-%m-%d") - datetime.now()).days %}
+            {% else %}
+                {% set days = 999 %}
+            {% endif %}
+
+            <tr class="
+                {% if days <= 30 %}table-danger
+                {% elif days <= 60 %}table-warning
+                {% elif days <= 90 %}table-success
+                {% endif %}
+            ">
+                <td>{{ b.medicine_name }}</td>
+                <td>{{ b.series }}</td>
+                <td>{{ b.expiry }}</td>
+                <td>{{ b.quantity }}</td>
+                <td>
+                    {% if b.expiry %}
+                        {{ days }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+<!-- ================= PENDING RESERVATIONS ================= -->
+<div id="pending-section" style="display:none;">
+
+    <h4>Непідтверджені накладні</h4>
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Відділення</th>
+                <th>Дата</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in reservations %}
+                {% if r.status == 'pending' %}
+                <tr class="table-warning">
+                    <td>{{ r.id }}</td>
+                    <td>{{ r.department }}</td>
+                    <td>{{ r.created }}</td>
+                    <td>
+                        <a href="/reservation/{{ r.id }}" class="btn btn-sm btn-primary">
+                            Відкрити
+                        </a>
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+<!-- ================= CONFIRMED RESERVATIONS ================= -->
+
+<div id="confirmed-section" style="display:none;">
+
+    <h4>Підтверджені накладні</h4>
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Відділення</th>
+                <th>Дата</th>
+                <th>Статус</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in reservations %}
+                {% if r.status == 'confirmed' %}
+                <tr class="table-success">
+                    <td>{{ r.id }}</td>
+                    <td>{{ r.department }}</td>
+                    <td>{{ r.created }}</td>
+                    <td>✔ Підтверджено</td>
+                    <td>
+                        <a href="/reservation/{{ r.id }}" 
+                           class="btn btn-sm btn-primary">
+                           Відкрити
+                        </a>
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+<!-- ================= JAVASCRIPT ================= -->
+<script>
+
+function showClear() {
+
+    let block = document.getElementById("clearBlock")
+
+    if (block.style.display === "none") {
+        block.style.display = "block"
+    } else {
+        block.style.display = "none"
+    }
+
+}
+
+
+function showSection(section) {
+
+    document.getElementById("summary-section").style.display = "none";
+    document.getElementById("batches-section").style.display = "none";
+    document.getElementById("pending-section").style.display = "none";
+    document.getElementById("confirmed-section").style.display = "none";
+
+    document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
+
+    if (section === "summary") {
+        document.getElementById("summary-section").style.display = "block";
+        document.querySelectorAll(".nav-btn")[0].classList.add("active");
+    }
+
+    if (section === "batches") {
+        document.getElementById("batches-section").style.display = "block";
+        document.querySelectorAll(".nav-btn")[1].classList.add("active");
+    }
+
+    if (section === "pending") {
+        document.getElementById("pending-section").style.display = "block";
+        document.querySelectorAll(".nav-btn")[2].classList.add("active");
+    }
+
+    if (section === "confirmed") {
+        document.getElementById("confirmed-section").style.display = "block";
+        document.querySelectorAll(".nav-btn")[3].classList.add("active");
+    }
+
+}
+
+
+
+function searchBatches() {
+
+    let input = document.getElementById("batchSearch");
+    let filter = input.value.toLowerCase();
+
+    let table = document.getElementById("batchesTable");
+    let tbody = table.getElementsByTagName("tbody")[0];
+    let tr = tbody.getElementsByTagName("tr");
+
+    for (let i = 0; i < tr.length; i++) {
+
+        let td = tr[i].getElementsByTagName("td")[0];
+
+        if (td) {
+
+            let textValue = td.textContent || td.innerText;
+
+            if (textValue.toLowerCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+
+        }
+
+    }
+
+}
+
+
+
+function searchSummary() {
+
+    let input = document.getElementById("summarySearch");
+    let filter = input.value.toLowerCase();
+
+    let table = document.getElementById("summaryTable");
+    let tbody = table.getElementsByTagName("tbody")[0];
+    let tr = tbody.getElementsByTagName("tr");
+
+    for (let i = 0; i < tr.length; i++) {
+
+        let td = tr[i].getElementsByTagName("td")[0];
+
+        if (td) {
+
+            let textValue = td.textContent || td.innerText;
+
+            if (textValue.toLowerCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+
+        }
+
+    }
+
+}
+
+</script>
+
+{% endblock %}

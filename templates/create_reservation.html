@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>📝 Створити резерв</h2>
+
+<form action="/dashboard" method="get">
+    <button style="background:#0d6efd;color:white;border:none;padding:8px 14px;border-radius:6px;">
+        ⬅ Назад
+    </button>
+</form>
+
+<br><br>
+
+<h3>📦 Доступні препарати</h3>
+
+<table width="100%" cellpadding="8" style="border-collapse:collapse;margin-bottom:25px;">
+    <tr style="background:#f1f3f5;">
+        <th>Назва</th>
+        <th>Серія</th>
+        <th>Термін</th>
+        <th>Місце</th>
+        <th>Залишок</th>
+    </tr>
+
+    {% for m in medicines %}
+    <tr>
+        <td>{{ m.name }}</td>
+        <td>{{ m.series }}</td>
+        <td>{{ m.expiry_date }}</td>
+        <td>{{ m.location }}</td>
+        <td>{{ m.quantity }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3>➕ Оформити резерв</h3>
+
+<form method="POST" style="background:#f4f6f9;padding:20px;border-radius:12px;display:flex;gap:10px;align-items:center;">
+
+    <select name="medicine_id" required style="padding:8px;border-radius:6px;">
+        {% for m in medicines %}
+        <option value="{{ m.id }}">
+            {{ m.name }} | Серія {{ m.series }} | залишок {{ m.quantity }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <input type="number" name="quantity" placeholder="Кількість" required
+           style="background:#ffe3e3;border:1px solid #ff8787;padding:8px;border-radius:6px;">
+
+    <button type="submit" style="background:#198754;color:white;border:none;padding:8px 14px;border-radius:6px;">
+        Створити
+    </button>
+
+</form>
+
+{% endblock %}

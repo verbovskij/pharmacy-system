@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>📦 Потреба закупівлі</h2>
+
+<table border="1" width="100%" cellpadding="6">
+<tr>
+<th>Назва</th>
+<th>Форма</th>
+<th>Наявність</th>
+<th>Мінімум</th>
+<th>Потрібно замовити</th>
+</tr>
+
+{% for r in data %}
+<tr>
+<td>{{ r.name }}</td>
+<td>{{ r.form }}</td>
+<td>{{ r.available }}</td>
+<td>{{ r.min }}</td>
+<td style="color:red;"><b>{{ r.need }}</b></td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">📋 Річний план відділень ({{ year }})</h2>
+
+<table class="table table-bordered">
+
+<thead class="table-dark">
+
+<tr>
+<th>Препарат</th>
+<th>Форма</th>
+
+{% for d in departments %}
+
+<th>{{ d.username }}</th>
+{% endfor %}
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for m in data %}
+
+<tr>
+
+<td>{{ m.name }}</td>
+<td>{{ m.form }}</td>
+
+{% for d in m.departments %}
+
+<td>
+
+<form method="POST" action="/year_plan">
+
+<input type="hidden" name="medicine_id" value="{{ m.id }}">
+<input type="hidden" name="department" value="{{ d.department }}">
+
+<input
+type="number"
+name="plan"
+value="{{ d.plan }}"
+class="form-control form-control-sm"
+style="width:90px; display:inline-block;"
+
+>
+
+<button class="btn btn-sm btn-success">
+💾
+</button>
+
+</form>
+
+<div style="font-size:12px; margin-top:4px">
+
+<span class="text-muted">
+використано: {{ d.plan - d.remaining }}
+</span>
+
+<br>
+
+<span class="{% if d.remaining < 0 %}text-danger{% endif %}">
+залишок: {{ d.remaining }}
+</span>
+
+</div>
+
+</td>
+
+{% endfor %}
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+{% endblock %}

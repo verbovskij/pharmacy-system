@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🧾 Накладна №{{ invoice.id }}</h2>
+<p>Відділення: {{ invoice.department }}</p>
+<p>Статус: {{ invoice.status }}</p>
+
+<form method="POST">
+<table width="100%" cellpadding="8">
+<tr>
+<th>Назва</th>
+<th>Серія</th>
+<th>Попросили</th>
+<th>Є на складі</th>
+<th>Дія</th>
+</tr>
+
+{% for item in items %}
+<tr {% if item.quantity > item.stock_qty %} style="background:#ffcccc;" {% endif %}>
+<td>{{ item.name }}</td>
+<td>{{ item.series }}</td>
+<td>
+{% if role in ["admin","warehouse"] and invoice.status == "pending" %}
+<input type="number"
+       name="edit_{{ item.id }}"
+       value="{{ item.quantity }}"
+       min="0"
+       max="{{ item.stock_qty }}"
+       style="width:70px;">
+{% else %}
+{{ item.quantity }}
+{% endif %}
+</td>
+<td>{{ item.stock_qty }}</td>
+<td>
+{% if invoice.status == "pending" %}
+<a href="/delete_item/{{ item.id }}">❌</a>
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+</table>
+
+{% if role in ["admin","warehouse"] and invoice.status == "pending" %}
+<br>
+<button name="save_edit" value="1">💾 Зберегти зміни</button>
+{% endif %}
+</form>
+
+{% if role in ["admin","warehouse"] and invoice.status == "pending" %}
+<hr>
+<h3>➕ Додати нову позицію</h3>
+<form method="POST">
+<select name="medicine_id">
+{% for m in medicines %}
+<option value="{{ m.id }}">
+{{ m.name }} | {{ m.series }} | Залишок: {{ m.quantity }}
+</option>
+{% endfor %}
+</select>
+<input type="number" name="quantity" required>
+<button name="add_new" value="1">Додати</button>
+</form>
+
+<br>
+<a href="/approve_invoice/{{ invoice.id }}"
+   style="background:#198754;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">
+   ✅ Підтвердити накладну
+</a>
+{% endif %}
+
+{% endblock %}

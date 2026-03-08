@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Відділення: {{ session.user }}</h2>
+
+<h4>Замовлення препаратів</h4>
+
+<form method="POST" action="/create_reservation">
+
+<table class="table table-bordered">
+
+<thead style="background:#1f2933;color:white;">
+<tr>
+<th>Препарат</th>
+<th>Доступно на складі</th>
+<th>Залишок плану</th>
+<th>Замовити</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for m in medicines %}
+
+<tr>
+
+<td>{{ m.name }}</td>
+
+<td>
+{% if m.total <= 0 %}
+<span style="color:red;font-weight:bold;">0</span>
+{% else %}
+{{ m.total }}
+{% endif %}
+</td>
+
+<td>
+{% if m.remaining <= 0 %}
+<span style="color:red;font-weight:bold;">{{ m.remaining }}</span>
+{% else %}
+{{ m.remaining }}
+{% endif %}
+</td>
+
+<td>
+<input type="number"
+name="qty_{{ m.id }}"
+min="0"
+max="{{ m.total }}"
+class="form-control"
+placeholder="0">
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+<br>
+
+<button type="submit" class="btn btn-primary">
+Сформувати накладну
+</button>
+
+<a href="/logout" class="btn btn-secondary">
+Вийти
+</a>
+
+</form>
+
+{% endblock %}

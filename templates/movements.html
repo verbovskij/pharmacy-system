@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>📒 Журнал руху</h2>
+
+<table border="1" width="100%" cellpadding="6">
+<tr>
+<th>Дата</th>
+<th>Тип</th>
+<th>Препарат</th>
+<th>Кількість</th>
+<th>Користувач</th>
+</tr>
+
+{% for m in data %}
+<tr>
+<td>{{ m.created_at }}</td>
+<td>{{ m.type }}</td>
+<td>{{ m.name }}</td>
+<td>{{ m.quantity }}</td>
+<td>{{ m.user }}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

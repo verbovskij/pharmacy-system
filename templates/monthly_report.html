@@ -1,0 +1,20 @@
+<h2>Місячний звіт</h2>
+
+<table border="1" cellpadding="5">
+<tr>
+<th>Назва</th>
+<th>Залишок зараз</th>
+<th>Видано за місяць</th>
+</tr>
+
+{% for row in data %}
+<tr>
+<td>{{ row.name }}</td>
+<td>{{ row.current_stock }}</td>
+<td>{{ row.total_out }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<br>
+<a href="/warehouse">Назад</a>

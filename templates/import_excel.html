@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3 class="mb-4">📥 Імпорт Excel</h3>
+
+<div class="card shadow p-4">
+<form method="POST" enctype="multipart/form-data">
+
+<div class="mb-3">
+    <label class="form-label">Вибрати Excel файл</label>
+    <input type="file" class="form-control" name="file" required>
+</div>
+
+<button class="btn btn-primary">Завантажити</button>
+<a href="/warehouse" class="btn btn-secondary">Назад</a>
+
+</form>
+</div>
+
+<div class="mt-4">
+<h6>Формат Excel:</h6>
+<p>Назва | Серія | Термін (YYYY-MM-DD) | Місце | Кількість | Мін.залишок</p>
+</div>
+
+{% endblock %}

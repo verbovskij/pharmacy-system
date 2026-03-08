@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Додати партію препарату</h2>
+
+<form method="post">
+
+<div class="mb-3">
+<label>Назва препарату</label>
+<input type="text" name="name" class="form-control" required>
+</div>
+
+<div class="mb-3">
+<label>Форма</label>
+<select name="form" class="form-control">
+
+<option>таб</option>
+<option>фл</option>
+<option>амп</option>
+<option>кг</option>
+<option>літр</option>
+<option>шт</option>
+<option>пар</option>
+<option>м</option>
+<option>уп</option>
+
+</select>
+</div>
+
+<div class="mb-3">
+<label>Серія</label>
+<input type="text" name="series" class="form-control">
+</div>
+
+<div class="mb-3">
+<label>Термін придатності</label>
+<input type="date" name="expiry" class="form-control">
+</div>
+
+<div class="mb-3">
+<label>Кількість</label>
+<input type="number" name="quantity" class="form-control" required>
+</div>
+
+<button class="btn btn-success">
+Зберегти
+</button>
+
+<a href="/warehouse" class="btn btn-secondary">
+Назад
+</a>
+
+</form>
+
+{% endblock %}
