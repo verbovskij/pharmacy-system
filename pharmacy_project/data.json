@@ -1,0 +1,17 @@
+{
+    "warehouse": {
+        "анальгін": {
+            "batches": [
+                {
+                    "qty": 100,
+                    "series": "1001",
+                    "expiry": "2026-05-31",
+                    "location": "ящ 5"
+                }
+            ]
+        }
+    },
+    "departments": {},
+    "invoices": [],
+    "invoice_counter": 1
+}
